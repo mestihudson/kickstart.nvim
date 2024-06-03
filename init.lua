@@ -90,8 +90,12 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.opt.foldenable = true
+vim.opt.foldmethod = 'indent'
+-- vim.opt.foldcolumn = '1'
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -295,6 +299,120 @@ require('lazy').setup({
       }, { mode = 'v' })
     end,
   },
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      vim.keymap.set('n', '<leader>nt', ':NvimTreeToggle<CR>', { desc = '[N]vimTree [T]oggle', silent = true })
+      vim.keymap.set('n', '<leader>nf', ':NvimTreeFocus<CR>', { desc = '[N]vimTree [F]ocus', silent = true })
+      require('nvim-tree').setup {
+        sort = {
+          sorter = 'case_sensitive',
+        },
+        view = {
+          width = 40,
+          side = 'right',
+        },
+        git = {
+          enable = true,
+        },
+        renderer = {
+          indent_markers = {
+            enable = true,
+          },
+          group_empty = true,
+          highlight_git = true,
+          icons = {
+            web_devicons = {
+              file = {
+                enable = true,
+                color = true,
+              },
+              folder = {
+                enable = false,
+                color = true,
+              },
+            },
+            git_placement = 'before',
+            padding = ' ',
+            modified_placement = 'after',
+            show = {
+              git = true,
+              file = true,
+              folder_arrow = true,
+              folder = true,
+            },
+            glyphs = {
+              git = {
+                unstaged = '✗',
+                staged = '✓',
+                unmerged = '',
+                renamed = '➜',
+                untracked = '★',
+                deleted = '',
+                ignored = '◌',
+              },
+            },
+          },
+        },
+        filters = {
+          dotfiles = true,
+        },
+        update_focused_file = {
+          enable = true,
+          update_root = false,
+          ignore_list = {},
+        },
+      }
+    end,
+  },
+  {
+    'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
+      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+    },
+    init = function()
+      vim.g.barbar_auto_setup = false
+      vim.api.nvim_set_keymap('n', '<leader>bp', ':bp<CR>', { noremap = true, silent = true })
+      vim.api.nvim_set_keymap('n', '<leader>bn', ':bn<CR>', { noremap = true, silent = true })
+    end,
+    opts = {
+      -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
+      animation = true,
+      insert_at_start = true,
+      -- …etc.
+    },
+    version = '^1.0.0', -- optional: only update when a new 1.x version is released
+  },
+  {
+    'kevinhwang91/nvim-ufo',
+    dependencies = { 'kevinhwang91/promise-async' },
+    opts = {
+      filetype_exclude = { 'help', 'alpha', 'dashboard', 'neo-tree', 'Trouble', 'lazy', 'mason' },
+    },
+    config = function(_, opts)
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('local_detach_ufo', { clear = true }),
+        pattern = opts.filetype_exclude,
+        callback = function()
+          require('ufo').detach()
+        end,
+      })
+      vim.opt.foldlevelstart = 99
+      require('ufo').setup(opts)
+    end,
+  },
+  {
+    'tribela/vim-transparent',
+  },
+  {
+    'rafamadriz/neon',
+  },
 
   -- NOTE: Plugins can specify dependencies.
   --
@@ -406,6 +524,9 @@ require('lazy').setup({
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
     end,
+  },
+  {
+    'mfussenegger/nvim-jdtls',
   },
 
   { -- LSP Configuration & Plugins
@@ -835,7 +956,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'java' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
